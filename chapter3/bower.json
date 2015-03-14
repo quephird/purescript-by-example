@@ -1,0 +1,27 @@
+{
+  "name": "chapter3",
+  "version": "1.0.0",
+  "description": "Second Purescript project",
+  "main": "Main.js",
+  "moduleType": [
+    "es6",
+    "node"
+  ],
+  "authors": [
+    "danielle kefford"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purescript-lists": "^0.6.0",
+    "purescript-maps": "^0.3.2",
+    "purescript-strings": "^0.4.3"
+  }
+}
