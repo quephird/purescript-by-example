@@ -1,0 +1,1 @@
+require("Recursion.Exercises").main();

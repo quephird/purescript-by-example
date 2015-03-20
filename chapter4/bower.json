@@ -1,0 +1,27 @@
+{
+  "name": "chapter4",
+  "description": "More exercises for PbE.",
+  "keywords": ["purescript"],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-arrays"               : "*",
+    "purescript-control"              : "*",
+    "purescript-foldable-traversable" : "*",
+    "purescript-maybe"                : "*"
+  },
+  "devDependencies": {
+    "purescript-math"                 : "*",
+    "purescript-quickcheck"           : "*"
+  }
+}
