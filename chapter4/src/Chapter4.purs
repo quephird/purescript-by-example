@@ -89,20 +89,17 @@ onlyFiles :: Path -> [Path]
 onlyFiles = filter isFile <<< allFiles where
   isFile = not <<< isDirectory
 
-largestFile :: Path
-largestFile = foldl fileCompare firstFile $ restFiles where
+selectFileWith :: (Number -> Number -> Prim.Boolean) -> Path
+selectFileWith comparator = foldl fileCompare firstFile $ restFiles where
   firstFile = head $ onlyFiles root
   restFiles = tail $ onlyFiles root
   size' = fromJust <<< size
-  fileCompare x acc = if size' x > size' acc
+  fileCompare x acc = if comparator (size' x) (size' acc)
                       then x
                       else acc
 
+largestFile :: Path
+largestFile = selectFileWith (>)
+
 smallestFile :: Path
-smallestFile = foldl fileCompare firstFile $ restFiles where
-  firstFile = head $ onlyFiles root
-  restFiles = tail $ onlyFiles root
-  size' = fromJust <<< size
-  fileCompare x acc = if size' x < size' acc
-                      then x
-                      else acc
+smallestFile = selectFileWith (<)
