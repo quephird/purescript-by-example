@@ -1,0 +1,28 @@
+{
+  "name": "chapter6",
+  "description": "Exercises for chapter6",
+  "keywords": ["purescript"],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-either"               : "*",
+    "purescript-globals"              : "*",
+    "purescript-maybe"                : "*",
+    "purescript-strings"              : "*",
+    "purescript-tuples"               : "*"
+  },
+  "devDependencies": {
+    "purescript-math"                 : "*",
+    "purescript-quickcheck"           : "*"
+  }
+}
