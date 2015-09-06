@@ -1,6 +1,6 @@
 module Chapter8 where
 
-import Prelude (($), (==), (/=), (<=), (+), (*), (/), bind, pure, return, unit)
+import Prelude (Monad, ($), (==), (/=), (<=), (+), (*), (/), bind, pure, return, unit)
 
 import Control.Monad.Eff
 import Control.Monad.Eff.Exception
@@ -8,6 +8,7 @@ import Control.Monad.Eff.Random
 import Control.Monad.ST
 import Data.Array ((!!), (:), filter, foldM, head, length, nub, sort, tail)
 import Data.Int (round, toNumber)
+import Data.List (List(..))
 import Data.Maybe
 import Data.Maybe.Unsafe (fromJust)
 import Data.Tuple (Tuple(..))
