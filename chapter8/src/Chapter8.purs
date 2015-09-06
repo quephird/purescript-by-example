@@ -6,7 +6,7 @@ import Control.Monad.Eff
 import Control.Monad.Eff.Exception
 import Control.Monad.Eff.Random
 import Control.Monad.ST
-import Data.Array ((!!), (:), filter, head, length, tail)
+import Data.Array ((!!), (:), filter, foldM, head, length, nub, sort, tail)
 import Data.Int (round, toNumber)
 import Data.Maybe
 import Data.Maybe.Unsafe (fromJust)
@@ -21,6 +21,20 @@ third xs = do
   xs'' <- tail xs'
   f <- head xs''
   return f
+
+sums :: Array Int -> Array Int
+sums lst = nub $ sort $ (foldM (\a e -> [a, a+e]) 0) lst
+
+filterM' :: forall m a. (Monad m) => (a -> m Boolean) -> List a -> List a -> m (List a)
+filterM' p acc Nil = return acc
+filterM' p acc (Cons x xs) = do
+  keep <- p x
+  case keep of
+    true  -> filterM' p (Cons x acc) xs
+    false -> filterM' p acc xs
+
+filterM :: forall m a. (Monad m) => (a -> m Boolean) -> List a -> m (List a)
+filterM p lst = filterM' p Nil lst
 
 -- Second set
 
