@@ -47,7 +47,7 @@ safeDivide' :: forall eff. Int -> Int -> Eff (err :: EXCEPTION | eff) Int
 safeDivide' _ 0 = throwException (error "Denominator does not divide numerator")
 safeDivide' a b = pure (a / b)
 
-pi :: forall eff r. Int -> Eff (st :: ST r, random :: RANDOM | eff) Number
+pi :: forall r. Int -> Eff (st :: ST r, random :: RANDOM) Number
 pi n = do
   ref <- newSTRef ([] :: Array (Tuple Number Number))
   forE 0.0 (toNumber n) $ \i -> do

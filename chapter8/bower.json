@@ -1,16 +1,26 @@
 {
-  "name": "chapter8",
-  "version": "1.0.0",
-  "moduleType": [
-    "node"
+  "name": "purescript-book-chapter8",
+  "description": "The Eff Monad",
+  "keywords": [
+    "purescript"
   ],
   "ignore": [
     "**/.*",
-    "node_modules",
     "bower_components",
-    "output"
+    "node_modules",
+    "output",
+    "tests",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
   ],
   "dependencies": {
-    "purescript-console": "^0.1.0"
+    "purescript-validation": "~0.2.0",
+    "purescript-strings": "^0.7.0",
+    "purescript-dom": "~0.1.2",
+    "purescript-foreign": "^0.7.0",
+    "purescript-console": "~0.1.0"
   }
 }
