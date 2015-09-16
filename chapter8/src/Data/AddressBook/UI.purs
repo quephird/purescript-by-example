@@ -11,6 +11,7 @@ import Data.Foreign.Class
 import Data.AddressBook
 import Data.AddressBook.Validation
 import Data.Traversable (sequence)
+import Data.Tuple (Tuple(..))
 
 import Control.Bind
 
@@ -29,22 +30,35 @@ valueOf sel = do
         Right s -> s
         _ -> ""
 
-displayValidationErrors :: forall eff. Array String -> Eff (dom :: DOM | eff) Unit
-displayValidationErrors errs = do
-  Just validationErrors <- querySelector "#validationErrors"
+toErrorSelector :: Field -> String
+toErrorSelector f =
+  "#error" ++ go f where
+  go f = case f of
+    FirstNameField -> "FirstName"
+    LastNameField  -> "LastName"
+    StreetField    -> "Street"
+    CityField      -> "City"
+    StateField     -> "State"
+    PhoneField HomePhone -> "HomePhone"
+    PhoneField WorkPhone -> "WorkPhone"
+    PhoneField CellPhone -> "CellPhone"
 
-  foreachE errs $ \err -> do
+
+displayValidationErrors :: forall eff. ValidationErrors -> Eff (console :: CONSOLE, dom :: DOM | eff) Unit
+displayValidationErrors errs = do
+  foreachE errs $ \(ValidationError field err) -> do
+    Just errorDiv <- querySelector $ toErrorSelector field
     divElement <- createElement "div"
     errText <- setText err divElement
     alertClass <- addClass "alert" errText
     alert <- addClass "alert-danger" alertClass
 
-    alert `appendChild` validationErrors
+    alert `appendChild` errorDiv
     return unit
 
   return unit
 
-validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either (Array String) Person)
+validateControls :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) (Either ValidationErrors Person)
 validateControls = do
   log "Running validators"
 
@@ -60,10 +74,18 @@ validateControls = do
 
   return $ validatePerson' p
 
+clearValidationErrors :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) Unit
+clearValidationErrors = do
+  Just errorDivs <- querySelectorAll "div[id^='error']"
+  foreachE errorDivs $ \errorDiv -> do
+    setInnerHTML "" errorDiv
+    return unit
+
+  return unit
+
 validateAndUpdateUI :: forall eff. Eff (console :: CONSOLE, dom :: DOM | eff) Unit
 validateAndUpdateUI = do
-  Just validationErrors <- querySelector "#validationErrors"
-  setInnerHTML "" validationErrors
+  clearValidationErrors
 
   errorsOrResult <- validateControls
 
