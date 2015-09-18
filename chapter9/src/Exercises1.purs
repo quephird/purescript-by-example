@@ -1,15 +1,16 @@
 module Exercises1 where
 
---import Prelude (($), (+), (-), (*), (/), bind, map, return, unit)
-import Prelude
+import Prelude (Unit(..), ($), (+), (-), (*), (/), bind, map, return, unit)
 
 import Control.Monad.Eff (Eff(..))
 import Control.Monad.Eff.Console (CONSOLE(..), log)
+import Control.Monad.Eff.Console.Unsafe (logAny)
 import Data.Array ((..))
 import Data.Int (toNumber)
 import Data.List (List(..), toList)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
+import Debug.Trace (traceAny)
 import Graphics.Canvas ( Canvas(..)
                        , Context2D(..)
                        , closePath
@@ -22,6 +23,7 @@ import Graphics.Canvas ( Canvas(..)
                        , setStrokeStyle
                        , strokePath)
 import Math (sin)
+import Unsafe.Coerce (unsafeCoerce)
 
 type Point =
   { x :: Number
@@ -43,17 +45,27 @@ renderPath ctx pts = renderPath' $ toList pts where
         renderPath' pts''
       _ -> return ctx
 
--- TODO: * Think of better names for parameters
+-- These two types and one function are necessary to pluck out
+-- the screen metrics through the Context2D object instead of
+-- being burdened with passing the entire canvas object around.
+type CanvasMini =
+  { clientWidth :: Number
+  , clientHeight :: Number
+  }
+type Context2DMini =
+  { canvas :: CanvasMini
+  }
+coerceContext2D :: Context2D -> Context2DMini
+coerceContext2D = unsafeCoerce
+
 mapRange :: Number ->
             Number -> Number ->
             Number -> Number ->
             Number
-mapRange value sourceStart sourceEnd targetStart targetEnd =
-  targetStart + (targetEnd-targetStart)*(value-sourceStart)/(sourceEnd-sourceStart)
+mapRange val start1 end1 start2 end2 =
+  start2 + (end2-start2) * (val-start1) / (end1-start1)
 
--- TODO: * Need to ask if all these returns are idiomatic
---       * Need to figure out how to determine width and height of canvas from ctx
---       * Add axes and ticks
+-- TODO: * Add axes and ticks
 plot :: forall eff. Context2D ->
                     (Number -> Number) ->
                     Tuple Number Number ->
@@ -61,14 +73,19 @@ plot :: forall eff. Context2D ->
                     Int ->
                     Eff (canvas :: Canvas, console :: CONSOLE | eff) Unit
 plot ctx f (Tuple fromX toX) (Tuple fromY toY) n = do
-  log $ show fromX
-  dx <- return $ (toX-fromX)/(toNumber n)
-  xs <- return $ map (\i -> (toNumber i)*dx + fromX) $ 0..n
-  realPts <- return $ map (\x -> Tuple x $ f x) xs
-  pts <- return $ map (\(Tuple x y) -> { x: mapRange x fromX toX 0.0 800.0,
-                                         y: mapRange y fromY toY 600.0 0.0 }) realPts
   renderPath ctx pts
-  return unit
+  return unit where
+    dx = (toX-fromX) / (toNumber n)
+    xs = map (\i -> (toNumber i)*dx + fromX) $ 0..n
+    realPts = map (\x -> Tuple x $ f x) xs
+    ctx' = coerceContext2D ctx
+    screenW = ctx'.canvas.clientWidth
+    screenH = ctx'.canvas.clientHeight
+    toScreenX screenW x = mapRange x fromX toX 0.0 screenW
+    toScreenY screenH y = mapRange y fromY toY screenH 0.0
+    toScreenCoords screenW screenH (Tuple x y) = { x: toScreenX screenW x,
+                                                   y: toScreenY screenH y}
+    pts = map (toScreenCoords screenW screenH) realPts
 
 main = do
   Just canvas <- getCanvasElementById "canvas"
@@ -78,5 +95,5 @@ main = do
   -- renderPath ctx [{ x: 100.0, y: 200.0 }
   --                ,{ x: 300.0, y: 300.0 }]
 
-  setStrokeStyle "#FF00FF" ctx
+  setStrokeStyle "#FF77FF" ctx
   plot ctx (\x -> sin x) (Tuple (-6.0) 6.0) (Tuple (-1.5) 1.5) 50
