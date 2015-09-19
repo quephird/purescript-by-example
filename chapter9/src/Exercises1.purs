@@ -1,6 +1,6 @@
 module Exercises1 where
 
-import Prelude (Unit(..), (<<<), ($), (+), (-), (*), (/), bind, map, return, unit)
+import Prelude (Unit(..), ($), (+), (-), (*), (/), bind, map, return, unit)
 
 import Control.Monad.Eff (Eff(..))
 import Control.Monad.Eff.Console (CONSOLE(..), log)
