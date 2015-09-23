@@ -12,15 +12,33 @@ import Data.Maybe (Maybe(..))
 import Data.Traversable (for)
 
 import Graphics.Canvas ( arc
+                       , canvasToDataURL
+                       , clearRect
+                       , drawImage
                        , fillPath
                        , getCanvasElementById
                        , getContext2D
+                       , rotate
                        , setFillStyle
                        , setStrokeStyle
-                       , strokePath)
+                       , strokePath
+                       , translate
+                       , withContext
+                       )
 import Graphics.Drawing.Color ( colorString
                               , rgb)
 
+-- import Control.Monad.Eff.Console.Unsafe (logAny)
+
+import Exercises1 (getScreenRect)
+import CanvasPatch ( makeCanvasImageSource)
+
+-- Exercise 1
+strokeAndFillPath ctx path = do
+  fillPath ctx path
+  strokePath ctx path
+
+-- Exercise 2
 randomColor = do
   r <- randomRange 0.0 256.0
   g <- randomRange 0.0 256.0
@@ -37,17 +55,24 @@ randomCirclePath = do
          , start: 0.0
          , end: Math.pi * 2.0 }
 
-strokeAndFillPath ctx path = do
-  fillPath ctx path
-  strokePath ctx path
-
 main = do
   Just canvas <- getCanvasElementById "canvas"
   ctx <- getContext2D canvas
-
+  let screenRect = getScreenRect ctx
   node <- querySelector "#canvas"
 
   for node $ addEventListener "click" $ do
+    withContext ctx do
+      url <- canvasToDataURL canvas
+      canvasImageSource <- makeCanvasImageSource url
+      clearRect ctx screenRect
+      translate { translateX: 0.5*screenRect.w
+                , translateY: 0.5*screenRect.h } ctx
+      rotate (0.01*Math.pi) ctx
+      translate { translateX: (-0.5)*screenRect.w
+                , translateY: (-0.5)*screenRect.h } ctx
+      drawImage ctx canvasImageSource 0.0 0.0
+
     fillColor <- randomColor
     strokeColor <- randomColor
     circlePath <- randomCirclePath
