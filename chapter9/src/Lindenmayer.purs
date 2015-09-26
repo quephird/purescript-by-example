@@ -57,12 +57,13 @@ renderSentencePath :: Context2D ->
                       Int ->
                       Eff (canvas :: Canvas) CanvasState
 renderSentencePath ctx initState sentence n = do
-  let dr = 360.0 / (pow 3.0 $ toNumber n)
   moveTo ctx initState.x initState.y
-  foldM (\state a -> go state a dr) initState sentence where
-    go state L _ = return $ state { t = state.t - Math.pi/3.0}
-    go state R _ = return $ state { t = state.t + Math.pi/3.0}
-    go state F dr = do
+  foldM go initState sentence
+  where
+    dr = 360.0 / (pow 3.0 $ toNumber n)
+    go state L = return $ state { t = state.t - Math.pi/3.0}
+    go state R = return $ state { t = state.t + Math.pi/3.0}
+    go state F = do
       let x' = state.x + Math.cos state.t * dr
           y' = state.y + Math.sin state.t * dr
       lineTo ctx x' y'
