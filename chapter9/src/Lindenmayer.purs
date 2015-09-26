@@ -1,8 +1,8 @@
 module Lindenmayer where
 
-import Prelude ( Monad, Show
-               , (+), (-), (*), (/), ($)
-               , bind, map, return
+import Prelude ( Eq, Monad, Show
+               , (+), (-), (*), (/), ($), (++), (==), (||)
+               , bind, map, return, show
                )
 
 import Control.Monad.Eff (Eff(..))
@@ -16,12 +16,24 @@ import Graphics.Canvas ( Canvas(..)
                        )
 import Math (pow)
 
-data Alphabet = L | R | F
+type Angle = Number
 
+data Alphabet = L | R | F | M
+
+-- So you can see things on the console; you don't get that for free.
 instance showAlphabet :: Show Alphabet where
   show L = "L"
   show R = "R"
   show F = "F"
+  show M = "M"
+
+-- You don't get equality for free either!
+instance eqAlphabet :: Eq Alphabet where
+  eq L L = true
+  eq R R = true
+  eq F F = true
+  eq M M = true
+  eq _ _ = false
 
 type Sentence = Array Alphabet
 
@@ -60,11 +72,15 @@ renderSentencePath ctx initState sentence n = do
   moveTo ctx initState.x initState.y
   foldM go initState sentence
   where
-    dr = 360.0 / (pow 3.0 $ toNumber n)
-    go state L = return $ state { t = state.t - Math.pi/3.0}
-    go state R = return $ state { t = state.t + Math.pi/3.0}
-    go state F = do
-      let x' = state.x + Math.cos state.t * dr
-          y' = state.y + Math.sin state.t * dr
-      lineTo ctx x' y'
-      return $ state { x = x', y = y' }
+    --  TODO: Need to either derive the two magic numbers below
+    --          or have specialized render functions for each lsystem path.
+    dr = 200.0 / (pow 3.0 $ toNumber n)
+    go state a =
+      case a of
+        L -> return $ state { t = state.t - Math.pi/3.0}
+        R -> return $ state { t = state.t + Math.pi/3.0}
+        _ -> do
+          let x' = state.x + Math.cos state.t * dr
+              y' = state.y + Math.sin state.t * dr
+          lineTo ctx x' y'
+          return $ state { x = x', y = y' }
