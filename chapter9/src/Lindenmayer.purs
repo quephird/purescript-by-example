@@ -6,8 +6,9 @@ import Prelude ( Monad, Show
                )
 
 import Control.Monad.Eff (Eff(..))
-import Data.Array (concatMap, foldM)
+import Data.Array ((..), concatMap, foldM)
 import Data.Int (toNumber)
+import Data.Foldable (foldl)
 import Graphics.Canvas ( Canvas(..)
                        , Context2D(..)
                        , lineTo
@@ -24,6 +25,14 @@ instance showAlphabet :: Show Alphabet where
 
 type Sentence = Array Alphabet
 
+iterateSentence :: forall a.
+                   (a -> Array a) ->
+                   Array a ->
+                   Int ->
+                   Array a
+iterateSentence rules initSentence n =
+  foldl (\sentence _ -> concatMap rules sentence) initSentence (1..n)
+
 lsystem :: forall a c m s. (Monad m) =>
            c ->
            Array a ->
@@ -32,9 +41,9 @@ lsystem :: forall a c m s. (Monad m) =>
            Int ->
            s ->
            m s
-lsystem ctx initSentence rules render n initState = go initSentence n where
-  go currSentence 0 = render ctx initState currSentence n
-  go currSentence n = go (concatMap rules currSentence) (n-1)
+lsystem ctx initSentence rules render n initState = do
+  let finalSentence = iterateSentence rules initSentence n
+  render ctx initState finalSentence n
 
 type CanvasState =
   { x :: Number
