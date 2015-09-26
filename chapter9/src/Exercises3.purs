@@ -1,3 +1,4 @@
+--module Exercises3 (kochInitSentence,kochRules) where
 module Exercises3 where
 
 import Prelude ( (+), (-), (*), (/), ($)
@@ -39,7 +40,7 @@ main = do
 
   setFillStyle "#7700FF" ctx
   fillPath ctx $ do
-    lsystem ctx kochInitSentence kochRules renderSentencePath 3 initialState
+    lsystem ctx kochInitSentence kochRules renderSentencePath 4 initialState
     closePath ctx
 
   return unit
