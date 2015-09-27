@@ -63,18 +63,33 @@ type CanvasState =
   , t :: Number
   }
 
-renderSentencePath :: Context2D ->
-                      CanvasState ->
-                      Sentence ->
-                      Int ->
-                      Eff (canvas :: Canvas) CanvasState
-renderSentencePath ctx initState sentence n = do
+renderKoch :: Context2D ->
+              CanvasState ->
+              Sentence ->
+              Int ->
+              Eff (canvas :: Canvas) CanvasState
+renderKoch ctx initState sentence n = renderSentence 3.0 ctx initState sentence n
+
+renderSierpinski :: Context2D ->
+                    CanvasState ->
+                    Sentence ->
+                    Int ->
+                    Eff (canvas :: Canvas) CanvasState
+renderSierpinski ctx initState sentence n = renderSentence 4.0 ctx initState sentence n
+
+renderSentence :: Number ->
+                  Context2D ->
+                  CanvasState ->
+                  Sentence ->
+                  Int ->
+                  Eff (canvas :: Canvas) CanvasState
+renderSentence scalingFactor ctx initState sentence n = do
   moveTo ctx initState.x initState.y
   foldM go initState sentence
   where
     --  TODO: Need to either derive the two magic numbers below
     --          or have specialized render functions for each lsystem path.
-    dr = 200.0 / (pow 3.0 $ toNumber n)
+    dr = 360.0 / (pow scalingFactor $ toNumber n)
     go state a =
       case a of
         L -> return $ state { t = state.t - Math.pi/3.0}
