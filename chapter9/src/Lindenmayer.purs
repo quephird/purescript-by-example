@@ -6,6 +6,7 @@ import Prelude ( Eq, Monad, Show
                )
 
 import Control.Monad.Eff (Eff(..))
+import Control.Monad.Eff.Random (RANDOM(..), randomRange)
 import Data.Array ((..), concatMap, foldM)
 import Data.Int (toNumber)
 import Data.Foldable (foldl)
@@ -67,23 +68,23 @@ renderKoch :: Context2D ->
               CanvasState ->
               Sentence ->
               Int ->
-              Eff (canvas :: Canvas) CanvasState
-renderKoch ctx initState sentence n = renderSentence 3.0 ctx initState sentence n
+              Eff (canvas :: Canvas, random :: RANDOM) CanvasState
+renderKoch ctx initState sentence n = renderSentence' 3.0 ctx initState sentence n
 
 renderSierpinski :: Context2D ->
                     CanvasState ->
                     Sentence ->
                     Int ->
-                    Eff (canvas :: Canvas) CanvasState
-renderSierpinski ctx initState sentence n = renderSentence 4.0 ctx initState sentence n
+                    Eff (canvas :: Canvas, random :: RANDOM) CanvasState
+renderSierpinski ctx initState sentence n = renderSentence' 4.0 ctx initState sentence n
 
-renderSentence :: Number ->
-                  Context2D ->
-                  CanvasState ->
-                  Sentence ->
-                  Int ->
-                  Eff (canvas :: Canvas) CanvasState
-renderSentence scalingFactor ctx initState sentence n = do
+renderSentence' :: Number ->
+                   Context2D ->
+                   CanvasState ->
+                   Sentence ->
+                   Int ->
+                   Eff (canvas :: Canvas, random :: RANDOM) CanvasState
+renderSentence' scalingFactor ctx initState sentence n = do
   moveTo ctx initState.x initState.y
   foldM go initState sentence
   where
@@ -95,7 +96,8 @@ renderSentence scalingFactor ctx initState sentence n = do
         L -> return $ state { t = state.t - Math.pi/3.0}
         R -> return $ state { t = state.t + Math.pi/3.0}
         _ -> do
-          let x' = state.x + Math.cos state.t * dr
-              y' = state.y + Math.sin state.t * dr
+          f <- randomRange 0.6 1.4
+          let x' = state.x + Math.cos state.t * dr * f
+              y' = state.y + Math.sin state.t * dr * f
           lineTo ctx x' y'
           return $ state { x = x', y = y' }
