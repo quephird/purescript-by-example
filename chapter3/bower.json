@@ -19,9 +19,9 @@
     "test",
     "tests"
   ],
-  "dependencies": {
-    "purescript-lists": "^0.6.0",
-    "purescript-maps": "^0.3.2",
-    "purescript-strings": "^0.4.3"
+  "dependencies": {},
+  "devDependencies": {
+    "purescript-psci-support": "^1.0.0",
+    "purescript-lists": "^1.0.1"
   }
 }

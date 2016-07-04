@@ -1,4 +1,5 @@
-.DS_Store
+**/.DS_Store
+**/output
 Thumbs.db
 dist
 node_modules
