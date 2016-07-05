@@ -1,4 +1,4 @@
-module Chapter2 where
+module Exercises where
 
 import Prelude ((*), (+))
 
